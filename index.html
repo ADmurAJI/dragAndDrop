@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <title>D3.js</title>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+</head>
+<body>
+
+<div class="container">
+    <div class="drag-and-drop">
+        <h4>Подтверждающий документ</h4>
+        <p class="text">Загрузите фото или сканы всех заполненных страниц документа в развёрнутом виде</p>
+        <div class="loading-area">
+            <p class="text-load">Переместите фаил в эту область, либо <button class="load-text">загрузите</button> его</p>
+            <p class="text-annotation">Формат файла jpg, jpeg или pdf, не более 5 Мб</p>
+        </div>
+        <div class="type-file">
+            <button class="delete-button">
+                <img src="trash-can%201.svg" alt="svg">
+            </button>
+                <p class="type-file-text-pdf">PDF</p>
+        </div>
+        <button class="add-achievement">Добавить достижение</button>
+    </div>
+</div>
+
+<script src="dragAndDrop.js"></script>
+
+</body>
+</html>
