@@ -1,4 +1,37 @@
 document.addEventListener('DOMContentLoaded', () => {
+
+    var photoButton = document.querySelector('.photo-button');
+
+    function showPhotoButton() {
+        if (window.innerWidth <= 768) {
+            photoButton.style.display = 'block';
+        } else {
+            photoButton.style.display = 'none';
+        }
+    }
+
+    // Вызываем функцию при загрузке страницы
+    showPhotoButton();
+
+    // Вызываем функцию при изменении размера окна
+    window.addEventListener('resize', showPhotoButton);
+
+    const textLoadElement = document.querySelector('.text-load');
+
+    function updateTextForMobile() {
+        if (window.innerWidth <= 768) {
+            textLoadElement.innerHTML = '<button class="load-text">Загрузите документ</button> либо сделайте фото';
+        } else {
+            textLoadElement.innerHTML = 'Переместите файл в эту область, либо <button class="load-text">загрузите</button> его';
+        }
+    }
+
+    // Вызов функции при первой загрузке страницы
+    updateTextForMobile();
+
+    // Вызов функции при изменении размера окна
+    window.addEventListener('resize', updateTextForMobile);
+
     // Функция для проверки и обработки файлов
     async function handleFiles(files) {
         let formatError = false;
@@ -7,7 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (files.length > 3) {
             alert('Вы можете выбрать не более 3 файлов одновременно');
             formatError = true;
-            sizeError = true; // Устанавливаем обе ошибки, чтобы отобразить общее сообщение об ошибке
+            sizeError = true;
         }
 
         const validFiles = [];
@@ -94,6 +127,18 @@ document.addEventListener('DOMContentLoaded', () => {
             const deleteButton = document.createElement('button');
             deleteButton.classList.add('delete-button');
 
+            // Обработчик событий для кнопки удаления
+            deleteButton.addEventListener('click', function() {
+                // Удаляем элемент type-file из DOM
+                typeFileContainer.remove();
+
+                // Удаляем файл из массива validFiles
+                const fileIndex = validFiles.findIndex(f => f.name === fileName);
+                if (fileIndex > -1) {
+                    validFiles.splice(fileIndex, 1);
+                }
+            });
+
             const deleteButtonImage = document.createElement('img');
             deleteButtonImage.src = 'trash-can%201.svg';
             deleteButtonImage.alt = 'svg';
@@ -149,47 +194,53 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('Файл загружен');
 
         // Начало загрузки файлов
-        const loader = document.querySelector('.loader');
-        const loadingPercent = document.querySelector('.loading-percent');
-        const spinner = document.querySelector('.loader-spinner');
-        loader.style.display = 'block';
-        spinner.style.display = 'block';
+        if (!formatError && !sizeError && validFiles.length > 0) {
+            const loader = document.querySelector('.loader');
+            const loadingPercent = document.querySelector('.loading-percent');
+            const spinner = document.querySelector('.loader-spinner');
+            loader.style.display = 'flex';
+            spinner.style.display = 'flex';
+            document.querySelector('.text-load').classList.add('hidden')
+            document.querySelector('.text-annotation').classList.add('hidden')
 
-        const formData = new FormData();
-        for (const file of files) {
-            formData.append('files[]', file);
+            const formData = new FormData();
+            for (const file of files) {
+                formData.append('files[]', file);
+            }
+
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', '/upload-url');
+
+            // Обработчик событий для отслеживания прогресса
+            xhr.upload.onprogress = function(event) {
+                if (event.lengthComputable) {
+                    const percentComplete = Math.round((event.loaded / event.total) * 100);
+                    loadingPercent.textContent = `${percentComplete}%`;
+                }
+            };
+
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    console.log('Файлы успешно загружены');
+                } else {
+                    console.error('Ошибка при загрузке файлов');
+                }
+                loader.style.display = 'none';
+                spinner.style.display = 'none';
+                document.querySelector('.text-load').classList.remove('hidden')
+                document.querySelector('.text-annotation').classList.remove('hidden')
+            };
+
+            xhr.onerror = function() {
+                console.error('Ошибка запроса');
+                loader.style.display = 'none';
+                spinner.style.display = 'none';
+                document.querySelector('.text-load').classList.remove('hidden')
+                document.querySelector('.text-annotation').classList.remove('hidden')
+            }
+            xhr.send(formData);
         }
-
-        const xhr = new XMLHttpRequest();
-        xhr.open('POST', '/upload-url');
-
-        // Обработчик событий для отслеживания прогресса
-        xhr.upload.onprogress = function(event) {
-            if (event.lengthComputable) {
-                const percentComplete = Math.round((event.loaded / event.total) * 100);
-                loadingPercent.textContent = `${percentComplete}%`;
-            }
-        };
-
-        xhr.onload = function() {
-            if (xhr.status === 200) {
-                console.log('Файлы успешно загружены');
-            } else {
-                console.error('Ошибка при загрузке файлов');
-            }
-            loader.style.display = 'none';
-            spinner.style.display = 'none';
-        };
-
-        xhr.onerror = function() {
-            console.error('Ошибка запроса');
-            loader.style.display = 'none';
-            spinner.style.display = 'none';
-        };
-
-        xhr.send(formData);
     }
-
 
     // Функция создания элемента input
     function createFileInput() {
@@ -217,11 +268,18 @@ document.addEventListener('DOMContentLoaded', () => {
     ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(event => {
         dropArea.addEventListener(event, (e) => {
             e.preventDefault();
-            dropArea.classList.toggle('drag-over', event === 'dragenter' || event === 'dragover');
+            // Добавляем класс только для событий dragenter и dragover
+            if (event === 'dragenter' || event === 'dragover') {
+                dropArea.classList.add('drag-over');
+            } else {
+                dropArea.classList.remove('drag-over');
+            }
         });
     });
 
     dropArea.addEventListener('drop', (e) => {
+        // Обрабатываем файлы и убираем класс drag-over
         handleFiles(e.dataTransfer.files);
+        dropArea.classList.remove('drag-over');
     });
 });
