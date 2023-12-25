@@ -30,7 +30,7 @@ body {
 }
 
 h4 {
-    text-align: left;
+    align-self: flex-start;
     margin-left: 40px;
     color: #152247;
     font-size: 18px;
@@ -63,7 +63,6 @@ h4 {
     text-align: center;
     font-size: 14px;
     font-style: normal;
-    font-weight: 400;
     line-height: 18px;
 }
 
@@ -72,15 +71,13 @@ h4 {
     text-align: center;
     font-size: 12px;
     font-style: normal;
-    font-weight: 400;
-    line-height: 16px;
+    margin-top: 0;
 }
 
 .load-text {
     color:#3964D8;
     font-size: 14px;
     font-style: normal;
-    font-weight: 400;
     line-height: 18px;
     background: none;
     border: none;
@@ -124,16 +121,49 @@ h4 {
     font-size: 10px;
     font-style: normal;
     font-weight: 600;
-    line-height: 12px;
     padding: 2px 5px;
     border-radius: 20px;
     background:#F15050;
 }
 
+.type-file-text-jpg {
+    color: #FFF;
+    text-align: center;
+    text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.10);
+    font-size: 10px;
+    font-style: normal;
+    font-weight: 600;
+    padding: 2px 5px;
+    border-radius: 20px;
+    background:#F2994A;
+}
+
+.type-file-text-jpeg {
+    color: #FFF;
+    text-align: center;
+    text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.10);
+    font-size: 10px;
+    font-style: normal;
+    font-weight: 600;
+    padding: 2px 5px;
+    border-radius: 20px;
+    background:#828282;
+}
+
+.container-file-extension {
+    display: flex;
+    gap: 10px;
+}
+
+.type-file {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
 .add-achievement {
     align-self: flex-start;
     margin-left: 40px;
-    align-items: end;
     border-radius: 6px;
     padding: 12px 20px;
     border: none;
@@ -152,4 +182,46 @@ h4 {
     background-color: rgba(52, 152, 219, 0.1);
     color: #3498db;
     transition: border-color 0.3s, background-color 0.3s;
+}
+
+.text-name-file {
+    color: #152247;
+    font-size: 14px;
+    font-style: normal;
+}
+
+.retry-text {
+    color: #3964D8;
+    cursor: pointer;
+}
+
+.loader {
+    display: flex; /* Используйте Flexbox */
+    align-items: center; /* Центрировать элементы по вертикали */
+    justify-content: flex-start; /* Расположение элементов в начале контейнера */
+    gap: 10px; /* Расстояние между элементами внутри loader */
+}
+
+.loader-spinner {
+    /* Ваши стили для спиннера */
+    /* Пример: */
+    border: 4px solid rgba(0, 0, 0, .1);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border-left-color: #09f;
+    animation: spin 1s ease infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Стили для текста загрузки и процентов, если требуется */
+.loading-percent {
+    /* Пример: */
+    font-size: 16px;
+    color: #000;
+    /* Другие стили по желанию */
 }
