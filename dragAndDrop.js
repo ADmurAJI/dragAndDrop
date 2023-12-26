@@ -1,7 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Выбираем элемент 'photo-button'
+    const photoButton = document.querySelector('.photo-button');
 
-    var photoButton = document.querySelector('.photo-button');
-
+    // Функция контролирует отображение элемента photoButton в зависимости от ширины окна
     function showPhotoButton() {
         if (window.innerWidth <= 768) {
             photoButton.style.display = 'block';
@@ -16,8 +17,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Вызываем функцию при изменении размера окна
     window.addEventListener('resize', showPhotoButton);
 
+
+    // Выбираем элемент с классом 'text-load'
     const textLoadElement = document.querySelector('.text-load');
 
+    // Функция updateTextForMobile обновляет текст внутри textLoadElement в зависимости от ширины окна
     function updateTextForMobile() {
         if (window.innerWidth <= 768) {
             textLoadElement.innerHTML = '<button class="load-text">Загрузите документ</button> либо сделайте фото';
@@ -34,16 +38,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Функция для проверки и обработки файлов
     async function handleFiles(files) {
+
+        // Создаем переменные для ошибок формата и размера файлов, изначально установлены в false
         let formatError = false;
         let sizeError = false;
 
+        // Если количество выбранных файлов больше 3, то устанавливаем ошибку формата и размера
         if (files.length > 3) {
             alert('Вы можете выбрать не более 3 файлов одновременно');
             formatError = true;
             sizeError = true;
         }
 
+        // Создаем массив для хранения валидных файлов
         const validFiles = [];
+        // Перебираем все выбранные файлы
         for (let i = 0; i < files.length; i++) {
             const file = files[i];
 
@@ -51,27 +60,28 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!formatError && (file.type !== 'image/jpeg' && file.type !== 'image/jpg' && file.type !== 'application/pdf')) {
                 formatError = true;
             }
-
             // Проверяем размер файла
             if (!sizeError && file.size > 5 * 1024 * 1024) {
                 sizeError = true;
             }
-
+            // Если нет ошибок формата и размера, добавляем файл в массив валидных файлов
             if (!formatError && !sizeError) {
                 validFiles.push(file);
             }
         }
 
+        // Выбираем элемент с классом 'retry-text' и устанавливаем ему стили и слушатель события для перезагрузки страницы
         const retryText = document.querySelector('.retry-text');
         if (retryText) {
             retryText.style.color = '#3964D8';
-            retryText.addEventListener('click', function() {
+            retryText.addEventListener('click', function () {
                 window.location.reload();
             });
         }
 
         // Если есть ошибка формата или размера
         if (formatError || sizeError) {
+            // Выбираем элемент с классом 'loading-area' и устанавливаем стили для отображения ошибки
             const loadingArea = document.querySelector('.loading-area');
             loadingArea.style.borderRadius = '2px';
             loadingArea.style.border = '1px solid #FAE8EC';
@@ -82,11 +92,13 @@ document.addEventListener('DOMContentLoaded', () => {
             loadingArea.style.alignItems = 'center';
             loadingArea.style.textAlign = 'center';
 
+            // Выбираем элемент с классом 'text-load' и устанавливаем текст ошибки и стили
             const textLoad = document.querySelector('.text-load');
             textLoad.textContent = 'Ошибка загрузки';
             textLoad.style.marginTop = '10px';
             textLoad.style.color = '#152247';
 
+            // Выбираем элемент с классом 'text-annotation' и устанавливаем сообщение об ошибке
             const textAnnotation = document.querySelector('.text-annotation');
 
             if (formatError || sizeError) {
@@ -98,61 +110,66 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else if (sizeError) {
                     errorMessage = 'Превышен размер файла. ';
                 }
+                // Устанавливаем сообщение об ошибке и добавляем ссылку для перезагрузки страницы
                 textAnnotation.innerHTML = errorMessage + '<span class="retry-text">Попробовать еще раз</span>';
 
+                // Выбираем элемент retryText и добавляем ему стили и слушатель события для перезагрузки страницы
                 const retryText = document.querySelector('.retry-text');
                 if (retryText) {
                     retryText.style.color = '#3964D8';
-                    retryText.addEventListener('click', function() {
+                    retryText.addEventListener('click', function () {
                         window.location.reload();
                     });
                 }
             }
         }
 
-        // Отобразите имя файлов из массива validFiles
+        // Получаем элементы, куда будем отображать имена файлов для каждого типа
         const fileNamePdfElement = document.getElementById('file-name-pdf');
         const fileNameJpgElement = document.getElementById('file-name-jpg');
         const fileNameJpegElement = document.getElementById('file-name-jpeg');
-
+        // Фильтруем файлы по их расширению
         const pdfFiles = validFiles.filter(file => file.name.toLowerCase().endsWith('.pdf'));
         const jpgFiles = validFiles.filter(file => file.name.toLowerCase().endsWith('.jpg'));
         const jpegFiles = validFiles.filter(file => file.name.toLowerCase().endsWith('.jpeg'));
 
-        // Создать и отобразить элементы type-file для каждого типа файла
+        // Создаём и отображаем элементы type-file для каждого типа файла
         function createTypeFileElement(type, fileName) {
+            // Создаем контейнер для элемента type-file
             const typeFileContainer = document.createElement('div');
             typeFileContainer.classList.add('type-file');
-
+            // Создаем кнопку удаления
             const deleteButton = document.createElement('button');
             deleteButton.classList.add('delete-button');
 
-            // Обработчик событий для кнопки удаления
-            deleteButton.addEventListener('click', function() {
+            // Добавляем обработчик события для кнопки удаления
+            deleteButton.addEventListener('click', function () {
                 // Удаляем элемент type-file из DOM
                 typeFileContainer.remove();
-
                 // Удаляем файл из массива validFiles
                 const fileIndex = validFiles.findIndex(f => f.name === fileName);
                 if (fileIndex > -1) {
                     validFiles.splice(fileIndex, 1);
                 }
             });
-
+            // Создаем изображение для кнопки удаления
             const deleteButtonImage = document.createElement('img');
             deleteButtonImage.src = 'trash-can%201.svg';
             deleteButtonImage.alt = 'svg';
 
             deleteButton.appendChild(deleteButtonImage);
 
+            // Создаем элемент для отображения имени файла
             const textNameFile = document.createElement('p');
             textNameFile.classList.add('text-name-file');
             textNameFile.textContent = fileName;
 
+            // Создаем элемент для отображения типа файла
             const fileTypeText = document.createElement('p');
             fileTypeText.classList.add(`type-file-text-${type}`);
             fileTypeText.textContent = type.toUpperCase();
 
+            // Добавляем элементы в контейнер type-file
             typeFileContainer.appendChild(deleteButton);
             typeFileContainer.appendChild(textNameFile);
             typeFileContainer.appendChild(fileTypeText);
@@ -161,13 +178,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
 
-        // Скрыть все элементы type-file
+        // Скрываем все элементы type-file
         document.querySelectorAll('.type-file').forEach(element => {
             element.style.display = 'none';
         });
 
+        // Если есть файлы с расширением .pdf
         if (pdfFiles.length > 0) {
+            // Отображаем имя первого файла в соответствующем элементе
             fileNamePdfElement.textContent = pdfFiles[0].name;
+            // Добавляем элементы type-file для каждого файла .pdf
             pdfFiles.forEach(file => {
                 const typeFileElement = createTypeFileElement('pdf', file.name);
                 document.querySelector('.container-file-extension').appendChild(typeFileElement);
@@ -193,82 +213,89 @@ document.addEventListener('DOMContentLoaded', () => {
         // Загружаем файлы на сервер
         console.log('Файл загружен');
 
-        // Начало загрузки файлов
+
+        // Начало загрузки файлов, если нет ошибок формата и размера, и есть валидные файлы
         if (!formatError && !sizeError && validFiles.length > 0) {
             const loader = document.querySelector('.loader');
             const loadingPercent = document.querySelector('.loading-percent');
             const spinner = document.querySelector('.loader-spinner');
+
+            // Отображаем элементы загрузки и скрываем текстовые сообщения
             loader.style.display = 'flex';
             spinner.style.display = 'flex';
             document.querySelector('.text-load').classList.add('hidden')
             document.querySelector('.text-annotation').classList.add('hidden')
 
+            // Создаем объект FormData для передачи файлов
             const formData = new FormData();
             for (const file of files) {
                 formData.append('files[]', file);
             }
 
             const xhr = new XMLHttpRequest();
-            xhr.open('POST', '/upload-url');
+            xhr.open('POST', 'какой то адрес');
 
-            // Обработчик событий для отслеживания прогресса
-            xhr.upload.onprogress = function(event) {
+            // Обработчик событий для отслеживания прогресса загрузки
+            xhr.upload.onprogress = function (event) {
                 if (event.lengthComputable) {
                     const percentComplete = Math.round((event.loaded / event.total) * 100);
                     loadingPercent.textContent = `${percentComplete}%`;
                 }
             };
-
-            xhr.onload = function() {
+            // Обработчик события при завершении загрузки
+            xhr.onload = function () {
                 if (xhr.status === 200) {
                     console.log('Файлы успешно загружены');
                 } else {
                     console.error('Ошибка при загрузке файлов');
                 }
+                // Скрываем элементы загрузки и восстанавливаем текстовые сообщения
                 loader.style.display = 'none';
                 spinner.style.display = 'none';
                 document.querySelector('.text-load').classList.remove('hidden')
                 document.querySelector('.text-annotation').classList.remove('hidden')
             };
-
-            xhr.onerror = function() {
+            // Обработчик события при ошибке запроса
+            xhr.onerror = function () {
                 console.error('Ошибка запроса');
+                // Скрываем элементы загрузки и восстанавливаем текстовые сообщения
                 loader.style.display = 'none';
                 spinner.style.display = 'none';
                 document.querySelector('.text-load').classList.remove('hidden')
                 document.querySelector('.text-annotation').classList.remove('hidden')
             }
+            // Отправляем FormData на сервер
             xhr.send(formData);
         }
     }
 
-    // Функция создания элемента input
+    // Функция для создания элемента input для загрузки файлов
     function createFileInput() {
         const fileInput = document.createElement('input');
         fileInput.type = 'file';
         fileInput.accept = 'image/jpeg, image/jpg, application/pdf';
         fileInput.multiple = true;
 
-        // Обработчик событий для выбора файла
+        // Обработчик события при выборе файла
         fileInput.addEventListener('change', (e) => {
             handleFiles(e.target.files);
         });
         return fileInput;
     }
 
-    // Обработчик клика на кнопку
+    // Обработчик клика на кнопку "Загрузить"
     const loadButton = document.querySelector('.load-text');
     loadButton.addEventListener('click', () => {
         const fileInput = createFileInput();
         fileInput.click();
     });
 
-    // Настройка зоны drag and drop
+    // Настройка зоны перетаскивания файлов (drag and drop)
     const dropArea = document.querySelector('.loading-area');
     ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(event => {
         dropArea.addEventListener(event, (e) => {
             e.preventDefault();
-            // Добавляем класс только для событий dragenter и dragover
+            // Добавляем класс 'drag-over' только для событий dragenter и dragover
             if (event === 'dragenter' || event === 'dragover') {
                 dropArea.classList.add('drag-over');
             } else {
@@ -276,9 +303,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
-
+    // Обработчик события при перетаскивании файлов в зону
     dropArea.addEventListener('drop', (e) => {
-        // Обрабатываем файлы и убираем класс drag-over
+        // Обрабатываем выбранные файлы и убираем класс 'drag-over'
         handleFiles(e.dataTransfer.files);
         dropArea.classList.remove('drag-over');
     });

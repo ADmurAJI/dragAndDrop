@@ -35,7 +35,6 @@ h4 {
     color: #152247;
     font-size: 18px;
     font-style: normal;
-    font-weight: 600;
     line-height: 22px;
 }
 
@@ -200,7 +199,6 @@ h4 {
     align-items: center;
     justify-content: center;
     display: none;
-
 }
 
 .loader-spinner {
@@ -222,7 +220,6 @@ h4 {
     }
 }
 
-
 .loading-percent {
     font-size: 16px;
     color: #000;
@@ -233,7 +230,6 @@ h4 {
 }
 
 .loading-area.drag-over {
-
     background-image: url('file-medical-1.svg');
     background-repeat: no-repeat;
     background-position: center;
@@ -278,7 +274,6 @@ h4 {
         margin-right: 10px;
     }
 
-
     .container-file-extension {
         flex-direction: column;
         align-items: center;
@@ -286,7 +281,7 @@ h4 {
     }
 
     .loading-area, .type-file {
-        height: 150px;
+        height: 170px;
         width: auto;
         margin: 20px 10px;
     }
@@ -309,7 +304,6 @@ h4 {
         height: 24px;
     }
 
-
     .type-file-text-pdf,
     .type-file-text-jpg,
     .type-file-text-jpeg {
@@ -321,6 +315,3 @@ h4 {
         margin-left: 80px;
     }
 }
-
-
-
