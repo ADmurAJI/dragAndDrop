@@ -39,31 +39,44 @@ document.addEventListener('DOMContentLoaded', () => {
     // Функция для проверки и обработки файлов
     async function handleFiles(files) {
 
+        // Создаем массив для хранения валидных файлов
+        const validFiles = [];
+
         // Создаем переменные для ошибок формата и размера файлов, изначально установлены в false
         let formatError = false;
         let sizeError = false;
 
-        // Если количество выбранных файлов больше 3, то устанавливаем ошибку формата и размера
-        if (files.length > 3) {
-            alert('Вы можете выбрать не более 3 файлов одновременно');
-            formatError = true;
+        // Создаём переменную для хранения общего размера всех файлов
+        let totalSize = 0;
+
+        // Сначала подсчитываем общий размер всех файлов
+        for (let i = 0; i < files.length; i++) {
+            totalSize += files[i].size;
+        }
+
+        // Проверяем общий размер всех файлов
+        if (totalSize > 5 * 1024 * 1024) {
             sizeError = true;
         }
 
-        // Создаем массив для хранения валидных файлов
-        const validFiles = [];
+        // Проверяем количество файлов
+        if (files.length > 3) {
+            alert('Вы можете выбрать не более 3 файлов одновременно');
+            formatError = true;
+        }
+
         // Перебираем все выбранные файлы
         for (let i = 0; i < files.length; i++) {
             const file = files[i];
 
+            // Выводим размер файла в консоль
+            console.log(`Размер файла '${file.name}': ${totalSize} байт`);
+
             // Проверяем формат файла
-            if (!formatError && (file.type !== 'image/jpeg' && file.type !== 'image/jpg' && file.type !== 'application/pdf')) {
+            if (file.type !== 'image/jpeg' && file.type !== 'image/jpg' && file.type !== 'application/pdf') {
                 formatError = true;
             }
-            // Проверяем размер файла
-            if (!sizeError && file.size > 5 * 1024 * 1024) {
-                sizeError = true;
-            }
+
             // Если нет ошибок формата и размера, добавляем файл в массив валидных файлов
             if (!formatError && !sizeError) {
                 validFiles.push(file);
