@@ -39,27 +39,24 @@ document.addEventListener('DOMContentLoaded', () => {
     // Создаем массив для хранения валидных файлов
     const validFiles = [];
 
+    // Объявляем переменные ошибок
+    let formatError = false;
+    let sizeError = false;
+
+
     // Функция для проверки и обработки файлов
     async function handleFiles(files) {
 
-        // Создаем переменные для ошибок формата и размера файлов, изначально установлены в false
-        let formatError = false;
-        let sizeError = false;
 
-        // Обновляем общий размер всех файлов, включая новые
-        let newTotalSize = validFiles.reduce((total, file) => total + file.size, 0);
-        for (let i = 0; i < files.length; i++) {
-            newTotalSize += files[i].size;
-        }
-
-        // Проверяем общий размер всех файлов
-        if (newTotalSize > 5 * 1024 * 1024) {
-            sizeError = true;
-        }
 
         // Перебираем все выбранные файлы
         for (let i = 0; i < files.length; i++) {
             const file = files[i];
+
+            // Проверяем общий размер всех файлов
+            if (file.size > 5 * 1024 * 1024) {
+                sizeError = true;
+            }
 
             // Проверяем формат файла
             if (file.type !== 'image/jpeg' && file.type !== 'image/jpg' && file.type !== 'application/pdf') {
@@ -337,7 +334,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-
     // Обработчик клика на кнопку "Загрузить"
     const loadButton = document.querySelector('.load-text');
     loadButton.addEventListener('click', () => {
@@ -359,10 +355,18 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
-    // Обработчик события при перетаскивании файлов в зону
+    // Обработчик события drop
     dropArea.addEventListener('drop', (e) => {
-        // Обрабатываем выбранные файлы и убираем класс 'drag-over'
-        handleFiles(e.dataTransfer.files);
+        e.preventDefault();
         dropArea.classList.remove('drag-over');
+
+        // Проверяем наличие ошибок перед обработкой файлов
+        if (formatError || sizeError) {
+            alert(' Присутствуют ошибки, перетащить файлы не получится. Воспользуйтесь функцией "Попробовать еще раз"');
+            return;
+        }
+
+        // Обрабатываем файлы
+        handleFiles(e.dataTransfer.files);
     });
 });
