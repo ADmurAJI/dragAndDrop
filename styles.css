@@ -54,6 +54,7 @@ h4 {
     border: 1px dashed #828282;
     background: #FFF;
     margin: 20px 40px;
+    cursor: url("file-medical 1.png"), auto;
 }
 
 .text-load {
@@ -84,7 +85,7 @@ h4 {
 }
 
 .type-file {
-    display: flex;
+    display: none;
     flex-direction: column;
     align-items: center;
     justify-content: center;
@@ -99,6 +100,7 @@ h4 {
 }
 
 .delete-button {
+    display: none;
     background: none;
     border: none;
     cursor: pointer;
@@ -152,12 +154,6 @@ h4 {
 .container-file-extension {
     display: flex;
     gap: 10px;
-}
-
-.type-file {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
 }
 
 .add-achievement, .photo-button {
@@ -229,12 +225,6 @@ h4 {
     display: none;
 }
 
-.loading-area.drag-over {
-    background-image: url('file-medical-1.svg');
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;
-}
 
 /* Стили для мобильных устройств */
 @media (max-width: 768px) {

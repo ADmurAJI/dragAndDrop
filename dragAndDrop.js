@@ -36,45 +36,40 @@ document.addEventListener('DOMContentLoaded', () => {
     // Вызов функции при изменении размера окна
     window.addEventListener('resize', updateTextForMobile);
 
+    // Создаем массив для хранения валидных файлов
+    const validFiles = [];
+
     // Функция для проверки и обработки файлов
     async function handleFiles(files) {
-
-        // Создаем массив для хранения валидных файлов
-        const validFiles = [];
 
         // Создаем переменные для ошибок формата и размера файлов, изначально установлены в false
         let formatError = false;
         let sizeError = false;
 
-        // Создаём переменную для хранения общего размера всех файлов
-        let totalSize = 0;
-
-        // Сначала подсчитываем общий размер всех файлов
+        // Обновляем общий размер всех файлов, включая новые
+        let newTotalSize = validFiles.reduce((total, file) => total + file.size, 0);
         for (let i = 0; i < files.length; i++) {
-            totalSize += files[i].size;
+            newTotalSize += files[i].size;
         }
 
         // Проверяем общий размер всех файлов
-        if (totalSize > 5 * 1024 * 1024) {
+        if (newTotalSize > 5 * 1024 * 1024) {
             sizeError = true;
-        }
-
-        // Проверяем количество файлов
-        if (files.length > 3) {
-            alert('Вы можете выбрать не более 3 файлов одновременно');
-            formatError = true;
         }
 
         // Перебираем все выбранные файлы
         for (let i = 0; i < files.length; i++) {
             const file = files[i];
 
-            // Выводим размер файла в консоль
-            console.log(`Размер файла '${file.name}': ${totalSize} байт`);
-
             // Проверяем формат файла
             if (file.type !== 'image/jpeg' && file.type !== 'image/jpg' && file.type !== 'application/pdf') {
                 formatError = true;
+            }
+
+            // Проверяем общее количество файлов
+            if (validFiles.length >= 3) {
+                alert('Вы можете выбрать не более 3 файлов одновременно');
+                break; // Прерываем цикл, если достигнут лимит файлов
             }
 
             // Если нет ошибок формата и размера, добавляем файл в массив валидных файлов
@@ -126,12 +121,33 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Устанавливаем сообщение об ошибке и добавляем ссылку для перезагрузки страницы
                 textAnnotation.innerHTML = errorMessage + '<span class="retry-text">Попробовать еще раз</span>';
 
-                // Выбираем элемент retryText и добавляем ему стили и слушатель события для перезагрузки страницы
+                // Функция для сброса состояния ошибки
+                function resetErrorState() {
+                    // Сброс состояний ошибок
+                    formatError = false;
+                    sizeError = false;
+
+                    // Сброс стилей и текстов для элементов, показывающих ошибку
+                    const loadingArea = document.querySelector('.loading-area');
+                    loadingArea.style.border = '1px dashed #828282';
+                    loadingArea.style.background = 'none';
+
+                    const textLoad = document.querySelector('.text-load');
+                    // Создаем новую кнопку и конфигурируем ее
+                    textLoad.innerHTML = 'Переместите файл в эту область, либо <button class="load-text">загрузите</button> его';
+                    const newLoadButton = textLoad.querySelector('.load-text');
+                    configureLoadButton(newLoadButton);
+
+                    const textAnnotation = document.querySelector('.text-annotation');
+                    textAnnotation.innerHTML = 'Формат файла jpg, jpeg или pdf, не более 5 Мб';
+                }
+
+                // Настройка обработчика событий для retryText
                 const retryText = document.querySelector('.retry-text');
                 if (retryText) {
                     retryText.style.color = '#3964D8';
                     retryText.addEventListener('click', function () {
-                        window.location.reload();
+                        resetErrorState();
                     });
                 }
             }
@@ -146,11 +162,21 @@ document.addEventListener('DOMContentLoaded', () => {
         const jpgFiles = validFiles.filter(file => file.name.toLowerCase().endsWith('.jpg'));
         const jpegFiles = validFiles.filter(file => file.name.toLowerCase().endsWith('.jpeg'));
 
+        // Функция сокращения названия файла
+        function shortenFileName(fileName, maxLength = 15) {
+            if (fileName.length > maxLength) {
+                return fileName.substring(0, maxLength - 3) + '...';
+            } else {
+                return fileName;
+            }
+        }
+
         // Создаём и отображаем элементы type-file для каждого типа файла
         function createTypeFileElement(type, fileName) {
             // Создаем контейнер для элемента type-file
             const typeFileContainer = document.createElement('div');
             typeFileContainer.classList.add('type-file');
+            typeFileContainer.style.display = 'flex'
             // Создаем кнопку удаления
             const deleteButton = document.createElement('button');
             deleteButton.classList.add('delete-button');
@@ -175,7 +201,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Создаем элемент для отображения имени файла
             const textNameFile = document.createElement('p');
             textNameFile.classList.add('text-name-file');
-            textNameFile.textContent = fileName;
+            textNameFile.textContent = shortenFileName(fileName);
 
             // Создаем элемент для отображения типа файла
             const fileTypeText = document.createElement('p');
@@ -258,10 +284,16 @@ document.addEventListener('DOMContentLoaded', () => {
             // Обработчик события при завершении загрузки
             xhr.onload = function () {
                 if (xhr.status === 200) {
+                    // Отображаем кнопку удаления файла
+                    //document.querySelectorAll('.delete-button').forEach(button => {
+                        //button.style.display = 'flex'})
                     console.log('Файлы успешно загружены');
                 } else {
                     console.error('Ошибка при загрузке файлов');
                 }
+
+                document.querySelectorAll('.delete-button').forEach(button => {
+                    button.style.display = 'flex'})
                 // Скрываем элементы загрузки и восстанавливаем текстовые сообщения
                 loader.style.display = 'none';
                 spinner.style.display = 'none';
@@ -296,6 +328,16 @@ document.addEventListener('DOMContentLoaded', () => {
         return fileInput;
     }
 
+
+    // Функция для создания и конфигурирования кнопки загрузки
+    function configureLoadButton(buttonElement) {
+        buttonElement.addEventListener('click', () => {
+            const fileInput = createFileInput();
+            fileInput.click();
+        });
+    }
+
+
     // Обработчик клика на кнопку "Загрузить"
     const loadButton = document.querySelector('.load-text');
     loadButton.addEventListener('click', () => {
@@ -310,6 +352,7 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             // Добавляем класс 'drag-over' только для событий dragenter и dragover
             if (event === 'dragenter' || event === 'dragover') {
+                dropArea.style.cursor = "url('file-medical 1.png'), auto";
                 dropArea.classList.add('drag-over');
             } else {
                 dropArea.classList.remove('drag-over');
